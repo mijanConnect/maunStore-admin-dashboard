@@ -7,7 +7,7 @@ export const getImageUrl = (path?: string): string => {
     return path;
   } else {
     // const baseUrl = "http://10.10.7.111:5000";
-    const baseUrl = "https://moshfiqur5000.binarybards.online";
+    const baseUrl = "https://api.raconliapp.com";
     return `${baseUrl}/${path}`;
   }
 };
