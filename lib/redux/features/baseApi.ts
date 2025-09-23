@@ -18,8 +18,8 @@ export const api = createApi({
     "Messages",
   ],
   baseQuery: fetchBaseQuery({
-    // baseUrl: "http://10.10.7.111:5000/api/v1",
-    baseUrl: "https://moshfiqur5000.binarybards.online/api/v1",
+    baseUrl: "http://10.10.7.111:5003/api/v1",
+    // baseUrl: "https://moshfiqur5000.binarybards.online/api/v1",
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
         const token = localStorage.getItem("accessToken");
