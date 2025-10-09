@@ -21,6 +21,7 @@ import {
   useDeleteNewsMutation,
 } from "@/lib/redux/apiSlice/newsApi";
 import { getImageUrl } from "@/components/dashboard/imageUrl";
+import Spinner from "@/components/spinner/Spinner";
 
 export default function NewsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -74,8 +75,8 @@ export default function NewsPage() {
     return html.replace(/<[^>]+>/g, "");
   };
 
-  if (isLoading) return <p>Loading news...</p>;
-  if (error) return <p>Error loading news.</p>;
+  if (isLoading) return <Spinner />;
+  // if (error) return <p>Error loading news.</p>;
 
   return (
     <div className="space-y-6">

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import BrandCategoryModal from "@/components/dashboard/BrandCategoryModal";
+import { getImageUrl } from "@/components/dashboard/imageUrl";
+import Spinner from "@/components/spinner/Spinner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -14,18 +16,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Eye, Search } from "lucide-react";
-import BrandCategoryModal from "@/components/dashboard/BrandCategoryModal";
-import Image from "next/image";
 import {
-  useGetBrandsQuery,
   useDeleteBrandMutation,
+  useGetBrandsQuery,
 } from "@/lib/redux/apiSlice/brandsApi";
 import {
-  useGetCategoriesQuery,
   useDeleteCategoryMutation,
+  useGetCategoriesQuery,
 } from "@/lib/redux/apiSlice/categoriesApi";
-import { getImageUrl } from "@/components/dashboard/imageUrl";
+import { Edit, Eye, Plus, Search, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 
 export default function BrandsPage() {
   const [showModal, setShowModal] = useState(false);
@@ -59,7 +60,7 @@ export default function BrandsPage() {
 
   const [deleteBrand] = useDeleteBrandMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
-  if (brandsLoading || categoriesLoading) return <p>Loading...</p>;
+  if (brandsLoading || categoriesLoading) return <Spinner />;
 
   const handleAdd = () => {
     setEditingItem(null);
@@ -152,7 +153,23 @@ export default function BrandsPage() {
           <Card>
             <CardContent>
               {filteredBrands.length === 0 ? (
-                <p>No brands found.</p>
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">📦</div>
+                  <h3 className="text-lg font-medium mb-2">No brands found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {searchTerm
+                      ? "Try adjusting your search terms."
+                      : "Get started by adding your first brands."}
+                  </p>
+                  {!searchTerm && (
+                    <div className="mt-4">
+                      <Button onClick={handleAdd}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Brand
+                      </Button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -266,7 +283,25 @@ export default function BrandsPage() {
           <Card>
             <CardContent>
               {filteredCategories.length === 0 ? (
-                <p>No categories found.</p>
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">📦</div>
+                  <h3 className="text-lg font-medium mb-2">
+                    No categories found
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    {searchTerm
+                      ? "Try adjusting your search terms."
+                      : "Get started by adding your first categories."}
+                  </p>
+                  {!searchTerm && (
+                    <div className="mt-4">
+                      <Button onClick={handleAdd}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Category
+                      </Button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <Table>
                   <TableHeader>

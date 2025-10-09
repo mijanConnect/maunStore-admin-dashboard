@@ -1,16 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import {
-  useAddBrandMutation,
-  useUpdateBrandMutation,
-} from "@/lib/redux/apiSlice/brandsApi";
-import {
-  useAddCategoryMutation,
-  useUpdateCategoryMutation,
-} from "@/lib/redux/apiSlice/categoriesApi";
-import { useGetBrandsQuery } from "@/lib/redux/apiSlice/brandsApi";
+import { ImageUpload } from "@/components/dashboard/image-upload";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -18,12 +9,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageUpload } from "@/components/dashboard/image-upload";
+import {
+  useAddBrandMutation,
+  useGetBrandsQuery,
+  useUpdateBrandMutation,
+} from "@/lib/redux/apiSlice/brandsApi";
+import {
+  useAddCategoryMutation,
+  useUpdateCategoryMutation,
+} from "@/lib/redux/apiSlice/categoriesApi";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { getImageUrl } from "./imageUrl";
 
 interface ModalProps {
@@ -66,6 +66,8 @@ export default function BrandCategoryModal({
     reset,
     setValue,
     watch,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: { name: "", description: "", brandId: "" },
@@ -90,6 +92,13 @@ export default function BrandCategoryModal({
 
   const onSubmit = async (data: FormData) => {
     if (mode === "view") return;
+    // Validate image presence: required when creating, or when editing without existing image
+    const needsImage = mode === "add" || (mode === "edit" && !item?.image);
+    if (needsImage && imageFiles.length === 0) {
+      setError("imageFile", { type: "required", message: "Image is required" });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -127,9 +136,17 @@ export default function BrandCategoryModal({
       setIsLoading(false);
       reset();
       setImageFiles([]);
+      clearErrors("imageFile");
       onClose();
     }
   };
+
+  // Clear image error when user adds an image
+  useEffect(() => {
+    if (imageFiles.length > 0) {
+      clearErrors("imageFile");
+    }
+  }, [imageFiles, clearErrors]);
 
   const getTitle = () => {
     if (mode === "add") return `Add ${type}`;
@@ -229,6 +246,11 @@ export default function BrandCategoryModal({
                 maxFiles={1}
                 accept="image/*"
               />
+              {errors.imageFile && (
+                <p className="text-sm text-red-500">
+                  {errors.imageFile.message}
+                </p>
+              )}
             </div>
           )}
 

@@ -26,6 +26,7 @@ import {
   useDeleteUserMutation,
 } from "@/lib/redux/apiSlice/usersApi";
 import { getImageUrl } from "@/components/dashboard/imageUrl";
+import Spinner from "@/components/spinner/Spinner";
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,8 +49,8 @@ export default function UsersPage() {
     totalPage: 1,
   };
 
-  if (isLoading) return <p>Loading users...</p>;
-  if (error) return <p>Error fetching users</p>;
+  if (isLoading) return <Spinner />;
+  // if (error) return <p>Error fetching users</p>;
 
   const handleStatusToggle = async (
     id: string,
@@ -140,7 +141,15 @@ export default function UsersPage() {
           {filteredUsers.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-4xl mb-4">👥</div>
-              <h3 className="text-lg font-medium mb-2">No users found</h3>
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">📦</div>
+                <h3 className="text-lg font-medium mb-2">No users found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {searchTerm
+                    ? "Try adjusting your search terms."
+                    : "Get started by adding your first users."}
+                </p>
+              </div>
               <p className="text-muted-foreground mb-4">
                 {searchTerm
                   ? "Try adjusting your search terms."

@@ -29,6 +29,7 @@ import {
 } from "@/lib/redux/apiSlice/categoriesApi";
 import { getImageUrl } from "@/components/dashboard/imageUrl";
 import { useGetBrandsQuery } from "@/lib/redux/apiSlice/brandsApi";
+import Spinner from "@/components/spinner/Spinner";
 // import { NewProductModal } from "@/components/dashboard/NewProductModal";
 
 // Updated Product interface to match API response
@@ -147,11 +148,11 @@ export default function ProductsPage() {
   const [deleteProduct] = useDeleteProductMutation();
 
   // Handle loading
-  if (categoriesLoading || productsLoading) return <p>Loading...</p>;
+  if (categoriesLoading || productsLoading) return <Spinner />;
 
   // Handle errors
-  if (categoriesError) return <p>Error fetching categories</p>;
-  if (productsError) return <p>Error fetching products</p>;
+  // if (categoriesError) return <p>Error fetching categories</p>;
+  // if (productsError) return <p>Error fetching products</p>;
 
   const handleAdd = () => {
     setEditingProduct(null);

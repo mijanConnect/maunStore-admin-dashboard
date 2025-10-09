@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 // import { addNews, updateNews } from "@/lib/redux/features/dataSlice";
+import { ImageUpload } from "@/components/dashboard/image-upload";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,18 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ImageUpload } from "@/components/dashboard/image-upload";
-import { News } from "@/types";
-import dynamic from "next/dynamic";
-import Image from "next/image";
-import { getImageUrl } from "./imageUrl";
 import {
   useCreateNewsMutation,
   useUpdateNewsMutation,
 } from "@/lib/redux/apiSlice/newsApi";
+import { News } from "@/types";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { getImageUrl } from "./imageUrl";
 
 import { useRef } from "react";
 
@@ -48,6 +48,7 @@ interface FormData {
 export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
   const dispatch = useDispatch();
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState("");
 
@@ -56,6 +57,8 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors },
     reset,
     setValue,
@@ -73,6 +76,24 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
 
   const onSubmit = async () => {
     if (mode === "view") return;
+
+    // Validate description (from editor)
+    if (!content || content.trim() === "") {
+      setError("description", {
+        type: "required",
+        message: "Description is required",
+      });
+      return;
+    }
+
+    // Validate image: required on add, or on edit if there are neither newly uploaded files nor existing images
+    const hasExistingImages = existingImages && existingImages.length > 0;
+    const needsImage =
+      mode === "add" || (mode === "edit" && !hasExistingImages);
+    if (needsImage && imageFiles.length === 0 && !hasExistingImages) {
+      setError("image", { type: "required", message: "Image is required" });
+      return;
+    }
 
     setIsLoading(true);
 
@@ -97,6 +118,8 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
       console.error("Failed to save news:", err);
     } finally {
       setIsLoading(false);
+      clearErrors("description");
+      clearErrors("image");
     }
   };
 
@@ -105,9 +128,12 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
     if (news && (mode === "edit" || mode === "view")) {
       setValue("title", news.title);
       setContent(news.description || "");
+      // initialize existing images for edit/view
+      setExistingImages(news.image ? [news.image] : []);
     } else if (mode === "add") {
       setValue("title", "");
       setContent("");
+      setExistingImages([]);
     }
   }, [news, mode, setValue]);
 
@@ -117,8 +143,22 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
       reset();
       setImageFiles([]);
       setContent("");
+      setExistingImages([]);
     }
   }, [isOpen, reset]);
+
+  // Clear errors when content/imageFiles change
+  useEffect(() => {
+    if (content && content.trim() !== "") {
+      clearErrors("description");
+    }
+  }, [content, clearErrors]);
+
+  useEffect(() => {
+    if (imageFiles.length > 0) {
+      clearErrors("image");
+    }
+  }, [imageFiles, clearErrors]);
 
   // const onSubmit = async (data: FormData) => {
   //   if (mode === "view") return;
@@ -247,6 +287,11 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
                 onBlur={(newContent) => setContent(newContent)}
               />
             </div>
+            {errors.description && (
+              <p className="text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {mode !== "view" && (
@@ -257,10 +302,18 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
                 onChange={setImageFiles}
                 maxFiles={1}
                 accept="image/*"
+                existingImages={existingImages}
+                onRemoveExisting={(index: number) =>
+                  setExistingImages((prev) =>
+                    prev.filter((_, i) => i !== index)
+                  )
+                }
               />
+              {errors.image && (
+                <p className="text-sm text-red-500">{errors.image.message}</p>
+              )}
             </div>
           )}
-
           {mode === "view" && news?.image && (
             <div className="space-y-2">
               <Label>News Image</Label>

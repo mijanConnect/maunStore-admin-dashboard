@@ -64,7 +64,7 @@ export const brandsApi = api.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Brand"],
+      invalidatesTags: ["Brand", "Category"],
     }),
 
     deleteBrand: builder.mutation<{ success: boolean }, string>({
@@ -72,7 +72,7 @@ export const brandsApi = api.injectEndpoints({
         url: `/brands/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Brand"],
+      invalidatesTags: ["Brand", "Brands", "Category", "Products"],
     }),
   }),
 });

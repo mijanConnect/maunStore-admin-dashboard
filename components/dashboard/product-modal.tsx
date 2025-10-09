@@ -371,8 +371,8 @@ export function ProductModal({
     );
   };
 
-  if (categoriesLoading) return <p>Loading...</p>;
-  if (categoriesError) return <p>Error fetching categories</p>;
+  // if (categoriesLoading) return <p>Loading...</p>;
+  // if (categoriesError) return <p>Error fetching categories</p>;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -551,6 +551,7 @@ export function ProductModal({
                       id="movement"
                       {...register("movement")}
                       placeholder="Enter movement type"
+                      required
                     />
                   </div>
 
@@ -560,6 +561,7 @@ export function ProductModal({
                       id="caseDiameter"
                       {...register("caseDiameter")}
                       placeholder="Enter case diameter (e.g., 42mm)"
+                      required
                     />
                   </div>
 
@@ -569,6 +571,7 @@ export function ProductModal({
                       id="caseThickness"
                       {...register("caseThickness")}
                       placeholder="Enter case thickness (e.g., 10mm)"
+                      required
                     />
                   </div>
                 </div>

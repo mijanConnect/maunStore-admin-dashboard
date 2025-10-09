@@ -19,7 +19,10 @@ export interface NewsApiResponse {
 
 export const newsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getNews: builder.query<NewsApiResponse, { page?: number; limit?: number } | void>({
+    getNews: builder.query<
+      NewsApiResponse,
+      { page?: number; limit?: number } | void
+    >({
       query: ({ page = 1, limit = 10 } = {}) => ({
         url: `/news?page=${page}&limit=${limit}`,
         method: "GET",

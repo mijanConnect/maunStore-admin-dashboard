@@ -196,6 +196,7 @@ export default function AddProductModal() {
                 value={formData.modelNumber}
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
+                required
               />
               <input
                 type="text"
@@ -220,6 +221,7 @@ export default function AddProductModal() {
                 value={formData.caseThickness}
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
+                required
               />
               <button
                 type="submit"
