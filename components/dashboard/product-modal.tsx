@@ -159,8 +159,22 @@ export function ProductModal({
     images?: File[];
   }) => {
     try {
+      // Prefer selectedCategory (controlled select) over form value to avoid invalid values
+      const categoryIdToSend =
+        selectedCategory || data.categoryId || product?.category?._id || "";
+
+      // Basic ObjectId validation (24 hex chars)
+      const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+      if (!objectIdRegex.test(categoryIdToSend)) {
+        // set a visible error instead of sending invalid payload
+        console.error("Invalid category id before submit:", categoryIdToSend);
+        alert("Please select a valid category before saving the product.");
+        return;
+      }
+
       const payload = {
         ...data,
+        categoryId: categoryIdToSend,
         images: imageFiles, // imageFiles is your File[]
       };
 

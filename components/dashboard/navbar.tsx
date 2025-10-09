@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/lib/store";
-import { Button } from "@/components/ui/button";
+import { useDispatch, useSelector } from "react-redux";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,22 +12,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-import { Bell, Settings, User } from "lucide-react";
-import { socketService } from "@/lib/socket";
-import {
-  addNotification,
-  markAsRead,
-  markAllAsRead,
-} from "@/lib/redux/features/notificationSlice";
-import LogoutButton from "./logoutButton";
 import { useGetProfileQuery } from "@/lib/redux/apiSlice/settingsApi";
+import {
+  markAllAsRead,
+  markAsRead,
+} from "@/lib/redux/features/notificationSlice";
+import type { RootState } from "@/lib/redux/store";
+import { Settings } from "lucide-react";
 import Link from "next/link";
+import LogoutButton from "./logoutButton";
 
 export function Navbar() {
   const dispatch = useDispatch();
