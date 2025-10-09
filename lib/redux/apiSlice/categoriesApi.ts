@@ -91,7 +91,7 @@ export const categoriesApi = api.injectEndpoints({
         url: `/categories/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Category", "Brand", "Brands", "Categories"],
+      invalidatesTags: ["Category", "Brand", "Brands", "Categories", "Products"],
     }),
   }),
 });
