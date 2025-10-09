@@ -1,18 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "../../components/ui/use-toast";
+import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useToast } from "../../components/ui/use-toast";
+import { useLoginMutation } from "../../lib/redux/features/authApi";
 import { setCredentials } from "../../lib/redux/features/authSlice";
 import { api } from "../../lib/redux/features/baseApi"; // ✅ import baseApi
-import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
-import { useLoginMutation } from "../../lib/redux/features/authApi";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -24,10 +24,12 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setError(""); // Clear previous error
 
     try {
       const result = await login({ email, password }).unwrap();
@@ -52,11 +54,7 @@ export default function LoginForm() {
       const message =
         err?.data?.message || err?.error || "Something went wrong";
 
-      toast({
-        title: "Login failed",
-        description: message,
-        // variant: "destructive", // if your toast supports variants
-      });
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -77,7 +75,10 @@ export default function LoginForm() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError(""); // Clear error when user types
+                }}
                 required
               />
             </div>
@@ -89,7 +90,10 @@ export default function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(""); // Clear error when user types
+                }}
                 required
               />
               <button
@@ -100,6 +104,12 @@ export default function LoginForm() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+
+            {error && (
+              <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                {error}
+              </div>
+            )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Logging in..." : "Login"}

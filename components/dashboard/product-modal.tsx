@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
-import {} from "@/lib/redux/apiSlice/productsApi";
+import { Product } from "@/app/dashboard/products/page";
+import { ImageUpload } from "@/components/dashboard/image-upload";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,10 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -23,25 +19,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ImageUpload } from "@/components/dashboard/image-upload";
-import { Product } from "@/app/dashboard/products/page";
 import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
+import { Textarea } from "@/components/ui/textarea";
+import { useGetBrandsQuery } from "@/lib/redux/apiSlice/brandsApi";
 import { useGetCategoriesQuery } from "@/lib/redux/apiSlice/categoriesApi";
-import { Category } from "@/types/index";
-import { ProductPayload } from "@/lib/redux/apiSlice/productsApi";
 import {
   useAddProductMutation,
   useUpdateProductMutation,
 } from "@/lib/redux/apiSlice/productsApi";
+import { Category } from "@/types/index";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { getImageUrl } from "./imageUrl";
-import { useGetBrandsQuery } from "@/lib/redux/apiSlice/brandsApi";
 
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   product?: Product | null;
   mode: "add" | "edit" | "view";
+  onSuccess?: () => void;
 }
 
 interface ProductFormData {
@@ -79,6 +77,7 @@ export function ProductModal({
   onClose,
   product,
   mode,
+  onSuccess,
 }: ProductModalProps) {
   const dispatch = useDispatch();
   // const brands = useSelector((state: RootState) => state.data.brands);
@@ -177,6 +176,7 @@ export function ProductModal({
       // console.log("Product added:", result);
       reset(); // reset form
       setImageFiles([]);
+      onSuccess?.(); // Call success callback before closing
       onClose();
     } catch (error) {
       console.error("Error adding product:", error);

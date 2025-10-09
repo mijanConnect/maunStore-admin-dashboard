@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/redux/store";
+import { getImageUrl } from "@/components/dashboard/imageUrl";
+import { ProductModal } from "@/components/dashboard/product-modal";
+import Spinner from "@/components/spinner/Spinner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -15,21 +15,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Edit, Trash2, Eye, Search } from "lucide-react";
-import { ProductModal } from "@/components/dashboard/product-modal";
-import Image from "next/image";
-import {
-  useGetProductsQuery,
-  useDeleteProductMutation,
-} from "@/lib/redux/apiSlice/productsApi";
-import AddProductModal from "@/components/dashboard/NewProductModal";
-import {
-  useGetAllCategoriesQuery,
-  useGetCategoriesQuery,
-} from "@/lib/redux/apiSlice/categoriesApi";
-import { getImageUrl } from "@/components/dashboard/imageUrl";
 import { useGetBrandsQuery } from "@/lib/redux/apiSlice/brandsApi";
-import Spinner from "@/components/spinner/Spinner";
+import { useGetAllCategoriesQuery } from "@/lib/redux/apiSlice/categoriesApi";
+import {
+  useDeleteProductMutation,
+  useGetProductsQuery,
+} from "@/lib/redux/apiSlice/productsApi";
+import { api } from "@/lib/redux/features/baseApi";
+import { Edit, Eye, Plus, Search, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 // import { NewProductModal } from "@/components/dashboard/NewProductModal";
 
 // Updated Product interface to match API response
@@ -94,6 +90,7 @@ interface ProductsApiResponse {
 }
 
 export default function ProductsPage() {
+  const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -132,6 +129,7 @@ export default function ProductsPage() {
     data: productsData,
     error: productsError,
     isLoading: productsLoading,
+    refetch,
   } = useGetProductsQuery({ page, limit, search: searchTerm } as {
     page?: number;
     limit?: number;
@@ -140,6 +138,7 @@ export default function ProductsPage() {
     data: ProductsApiResponse | undefined;
     error: any;
     isLoading: boolean;
+    refetch: () => void;
   };
 
   const products = productsData?.data?.data || [];
@@ -176,7 +175,9 @@ export default function ProductsPage() {
     if (confirm("Are you sure you want to delete this product?")) {
       try {
         await deleteProduct(id).unwrap();
-        alert("Product deleted successfully ✅");
+        // Force cache invalidation and refetch
+        dispatch(api.util.invalidateTags(["Products"]));
+        await refetch();
       } catch (err) {
         console.error("Delete failed:", err);
         alert("Failed to delete product ❌");
@@ -187,6 +188,16 @@ export default function ProductsPage() {
   const handleModalClose = () => {
     setShowModal(false);
     setEditingProduct(null);
+  };
+
+  const handleProductSuccess = async () => {
+    // Force cache invalidation and refetch products after successful add/edit
+    try {
+      dispatch(api.util.invalidateTags(["Products"]));
+      await refetch();
+    } catch (error) {
+      console.error("Failed to refetch products:", error);
+    }
   };
 
   const getBrandName = (brandId?: string) => {
@@ -224,6 +235,7 @@ export default function ProductsPage() {
         onClose={handleModalClose}
         product={editingProduct}
         mode={modalMode}
+        onSuccess={handleProductSuccess}
       />
 
       {/* <NewProductModal

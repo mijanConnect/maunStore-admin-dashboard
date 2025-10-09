@@ -192,6 +192,7 @@ export default function BrandsPage() {
                               width={40}
                               height={40}
                               className="rounded"
+                              key={brand._id}
                             />
                           ) : (
                             "📁"
@@ -319,13 +320,14 @@ export default function BrandsPage() {
                           <TableCell>{category.name}</TableCell>
                           <TableCell>{category.brandId?.name}</TableCell>
                           <TableCell>
-                            {category.brandId?.image ? (
+                            {category.image ? (
                               <Image
-                                src={getImageUrl(category.brandId.image)}
-                                alt={category.brandId.name}
+                                src={getImageUrl(category.image)}
+                                alt={category.name}
                                 width={40}
                                 height={40}
                                 className="rounded"
+                                key={category._id}
                               />
                             ) : (
                               "📁"

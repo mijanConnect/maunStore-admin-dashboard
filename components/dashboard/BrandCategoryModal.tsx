@@ -49,6 +49,7 @@ export default function BrandCategoryModal({
   type,
 }: ModalProps) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [addBrand] = useAddBrandMutation();
@@ -79,6 +80,9 @@ export default function BrandCategoryModal({
       setValue("name", item.name);
       setValue("description", item.description);
 
+      // Set existing images
+      setExistingImages(item.image ? [item.image] : []);
+
       if (type === "category" && item.brandId) {
         // ✅ Make sure we set brandId as string ID
         const brandId =
@@ -87,14 +91,32 @@ export default function BrandCategoryModal({
       }
     } else if (mode === "add") {
       reset();
+      setExistingImages([]);
     }
   }, [item, mode, reset, setValue, type]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setImageFiles([]);
+      setExistingImages([]);
+    }
+  }, [isOpen]);
+
+  // Clear image errors when images are added or existing images are present
+  useEffect(() => {
+    if (imageFiles.length > 0 || existingImages.length > 0) {
+      clearErrors("imageFile");
+    }
+  }, [imageFiles, existingImages, clearErrors]);
 
   const onSubmit = async (data: FormData) => {
     if (mode === "view") return;
     // Validate image presence: required when creating, or when editing without existing image
-    const needsImage = mode === "add" || (mode === "edit" && !item?.image);
-    if (needsImage && imageFiles.length === 0) {
+    const hasExistingImages = existingImages && existingImages.length > 0;
+    const needsImage =
+      mode === "add" || (mode === "edit" && !hasExistingImages);
+    if (needsImage && imageFiles.length === 0 && !hasExistingImages) {
       setError("imageFile", { type: "required", message: "Image is required" });
       return;
     }
@@ -245,6 +267,12 @@ export default function BrandCategoryModal({
                 onChange={setImageFiles}
                 maxFiles={1}
                 accept="image/*"
+                existingImages={existingImages}
+                onRemoveExisting={(index: number) =>
+                  setExistingImages((prev) =>
+                    prev.filter((_, i) => i !== index)
+                  )
+                }
               />
               {errors.imageFile && (
                 <p className="text-sm text-red-500">
