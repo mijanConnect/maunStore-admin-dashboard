@@ -1,7 +1,10 @@
 "use client";
 export const dynamic = "force-dynamic"; // at the top of page.tsx
 
-import { useState, useEffect, useRef } from "react";
+import { getImageUrl } from "@/components/dashboard/imageUrl";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,19 +12,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
-import { socketService } from "@/lib/socket";
-import { useGetChatsQuery } from "@/lib/redux/apiSlice/supportApi";
 import {
+  useGetChatsQuery,
   useGetMessagesQuery,
   useSendMessageMutation,
 } from "@/lib/redux/apiSlice/supportApi";
-import { getImageUrl } from "@/components/dashboard/imageUrl";
+import { socketService } from "@/lib/socket";
+import { Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface Message {
   id: string;
@@ -140,36 +140,6 @@ export default function SupportPage() {
 
     fetchMessages();
   }, [selectedChat, refetchMessages, loggedInUser._id]);
-
-  // Live listener for new messages
-  // useEffect(() => {
-  //   if (!loggedInUser._id || !selectedChat) return;
-
-  //   const socket = socketService.connect();
-  //   const eventName = `newMessage::${selectedChat.id}`;
-
-  //   const listener = (data: any) => {
-  //     const msg = data.message || data;
-
-  //     const formattedMessage: Message = {
-  //       id: msg._id || Math.random().toString(),
-  //       chatId: selectedChat.id,
-  //       senderId: msg.sender?._id || "unknown",
-  //       senderName: msg.sender?.name || "Unknown",
-  //       message: msg.text || msg,
-  //       timestamp: msg.createdAt || new Date().toISOString(),
-  //       isAdmin: msg.sender?._id === loggedInUser._id,
-  //     };
-
-  //     setMessages((prev) => [...prev, formattedMessage]); // ✅ append only new
-  //   };
-
-  //   socket.on(eventName, listener);
-
-  //   return () => {
-  //     socket.off(eventName, listener);
-  //   };
-  // }, [loggedInUser._id, selectedChat?.id]);
 
   const [sendMessageApi, { isLoading: sending }] = useSendMessageMutation();
 
@@ -336,6 +306,7 @@ export default function SupportPage() {
 
   return (
     <div className="space-y-6">
+      {/* Support Chat Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Support Chat</h1>
         <p className="text-muted-foreground">

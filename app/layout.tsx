@@ -7,8 +7,8 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MuanStore | Admin",
-  description: "Muan Store Admin dashboard",
+  title: "Raconli Group - Dashboard",
+  description: "Raconli Group Admin dashboard",
 };
 
 export default function RootLayout({

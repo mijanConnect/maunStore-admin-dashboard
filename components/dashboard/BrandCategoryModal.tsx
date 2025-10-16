@@ -171,9 +171,10 @@ export default function BrandCategoryModal({
   }, [imageFiles, clearErrors]);
 
   const getTitle = () => {
-    if (mode === "add") return `Add ${type}`;
-    if (mode === "edit") return `Edit ${type}`;
-    if (mode === "view") return `View ${type}`;
+    const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
+    if (mode === "add") return `Add ${capitalizedType}`;
+    if (mode === "edit") return `Edit ${capitalizedType}`;
+    if (mode === "view") return `View ${capitalizedType}`;
     return "";
   };
 
@@ -184,17 +185,19 @@ export default function BrandCategoryModal({
           <DialogTitle>{getTitle()}</DialogTitle>
           <DialogDescription>
             {mode === "add"
-              ? `Create a new ${type}`
+              ? `Create a new ${type.charAt(0).toUpperCase() + type.slice(1)}`
               : mode === "edit"
-              ? `Update ${type}`
-              : `View ${type}`}
+              ? `Update ${type.charAt(0).toUpperCase() + type.slice(1)}`
+              : `View ${type.charAt(0).toUpperCase() + type.slice(1)}`}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">{type} Name</Label>
+            <Label htmlFor="name">
+              {type.charAt(0).toUpperCase() + type.slice(1)} Name
+            </Label>
             <Input
               id="name"
               {...register("name", { required: "Name is required" })}
@@ -261,7 +264,9 @@ export default function BrandCategoryModal({
           {/* Image Upload */}
           {mode !== "view" && (
             <div className="space-y-2">
-              <Label>{type} Image</Label>
+              <Label>
+                {type.charAt(0).toUpperCase() + type.slice(1)} Image
+              </Label>
               <ImageUpload
                 value={imageFiles}
                 onChange={setImageFiles}
@@ -285,7 +290,9 @@ export default function BrandCategoryModal({
           {/* View Image */}
           {mode === "view" && item?.image && (
             <div className="space-y-2">
-              <Label>{type} Image</Label>
+              <Label>
+                {type.charAt(0).toUpperCase() + type.slice(1)} Image
+              </Label>
               <div className="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden">
                 <Image
                   src={getImageUrl(item.image)}

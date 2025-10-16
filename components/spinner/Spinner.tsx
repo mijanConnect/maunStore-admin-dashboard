@@ -1,9 +1,8 @@
-import React from "react";
 import "./spinner.css";
 
 export default function Spinner() {
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="fixed inset-0 flex justify-center items-center bg-white z-50">
       <span className="loader"></span>
     </div>
   );

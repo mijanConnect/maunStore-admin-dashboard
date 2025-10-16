@@ -111,9 +111,11 @@ export default function LoginForm() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
-            </Button>
+            <div className="pt-4">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </Button>
+            </div>
           </form>
 
           <div className="flex justify-end mt-2">

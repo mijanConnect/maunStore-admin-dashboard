@@ -1,14 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   BarChart3,
   Package,
+  ExternalLink,
+  Store,
   Users,
   Settings,
   Bell,
@@ -21,25 +23,25 @@ import {
   Layers3,
   Newspaper,
   Image,
-} from 'lucide-react';
+} from "lucide-react";
 
 const menuItems = [
-  // { title: 'Overview', href: '/dashboard', icon: BarChart3 },
-  
-  // { title: 'Sub Category Management', href: '/dashboard/subcategories', icon: Layers3 },
-  // { title: 'Size & Color Management', href: '/dashboard/sizes-colors', icon: Palette },
-  { title: 'Products Management', href: '/dashboard/products', icon: Package },
-  { title: 'Brands Management', href: '/dashboard/brands', icon: Package },
- 
-  // { title: 'Subscription Package', href: '/dashboard/subscriptions', icon: CreditCard },
-  { title: 'User Management', href: '/dashboard/users', icon: Users },
-  // { title: 'Subscriber Management', href: '/dashboard/subscribers', icon: UserCheck },
-  { title: 'News Management', href: '/dashboard/news-management', icon: Newspaper },
-  // { title: 'Banner Management', href: '/dashboard/banner-management', icon: Image },
-  { title: 'Support Chat', href: '/dashboard/support', icon: MessageCircle },
-  // { title: 'Push Notifications', href: '/dashboard/notifications', icon: Bell },
- 
-  { title: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { title: "Products Management", href: "/dashboard/products", icon: Package },
+  { title: "Brands Management", href: "/dashboard/brands", icon: Store },
+
+  { title: "User Management", href: "/dashboard/users", icon: Users },
+  {
+    title: "News Management",
+    href: "/dashboard/news-management",
+    icon: Newspaper,
+  },
+  {
+    title: "Application Link",
+    href: "/dashboard/application-link",
+    icon: ExternalLink,
+  },
+  { title: "Support Chat", href: "/dashboard/support", icon: MessageCircle },
+  { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -71,9 +73,9 @@ export function Sidebar() {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out z-50',
-          isOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:translate-x-0'
+          "fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out z-50",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:translate-x-0"
         )}
       >
         <div className="p-6">
@@ -90,10 +92,10 @@ export function Sidebar() {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    'flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? 'bg-[#E3A45C] text-white  '
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? "bg-[#E3A45C] text-white  "
+                      : "text-gray-700 hover:bg-gray-100"
                   )}
                 >
                   <item.icon className="h-5 w-5" />
