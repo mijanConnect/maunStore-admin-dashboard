@@ -92,7 +92,6 @@ export interface ChatParticipant {
 }
 
 // ---------- Support API Slice ----------
-
 export const supportApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getChats: builder.query<ChatsResponse, { page?: number; limit?: number }>({

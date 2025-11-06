@@ -66,7 +66,7 @@ export default function DashboardLayout({
   // Show loading while checking authentication
   if (isChecking) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center  bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           {/* <p className="text-gray-600">Checking authentication...</p> */}
@@ -77,9 +77,9 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className=" bg-gray-50">
       <Sidebar />
-      <div className="ml-0 lg:ml-64 min-h-screen">
+      <div className="ml-0 lg:ml-64 ">
         <Navbar />
         <main className="p-4 lg:p-8 mt-16">{children}</main>
       </div>
