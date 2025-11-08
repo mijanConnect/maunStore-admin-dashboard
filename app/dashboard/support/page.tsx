@@ -518,7 +518,7 @@ import {
   useSendMessageMutation,
 } from "@/lib/redux/apiSlice/supportApi";
 import { socketService } from "@/lib/socket";
-import { Send } from "lucide-react";
+import { Image as ImageIcon, Send, X as XIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -572,7 +572,12 @@ export default function SupportPage() {
         "Unknown",
       userEmail: chat.participants[0]?.email || "No Email",
       avatar: (chat.participants[0] as any)?.profileImage || "",
-      lastMessage: chat.lastMessage?.text || "No messages yet",
+      lastMessage: chat?.lastMessage?.text?.trim()
+        ? chat.lastMessage.text
+        : Array.isArray(chat?.lastMessage?.images) &&
+          chat.lastMessage.images.length > 0
+        ? "Image"
+        : "No messages yet",
       lastMessageTime: chat.lastMessage
         ? new Date(chat.lastMessage.updatedAt).toLocaleTimeString([], {
             hour: "2-digit",
@@ -598,6 +603,9 @@ export default function SupportPage() {
   );
 
   const [newMessage, setNewMessage] = useState("");
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedPreviews, setSelectedPreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -722,7 +730,8 @@ export default function SupportPage() {
   }, [loggedInUser._id, refetch]);
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedChat) return;
+    if (!selectedChat) return;
+    if (!newMessage.trim() && selectedImages.length === 0) return;
 
     const messageToSend = newMessage;
     setNewMessage("");
@@ -736,7 +745,8 @@ export default function SupportPage() {
           senderId: loggedInUser._id || "",
           senderName: loggedInUser.email || "Me",
           message: messageToSend,
-          images: [],
+          // show temporary previews for optimistic UI if any
+          images: selectedPreviews,
           timestamp: new Date().toISOString(),
           isAdmin: true,
         },
@@ -744,6 +754,10 @@ export default function SupportPage() {
 
       const formData = new FormData();
       formData.append("data", JSON.stringify({ text: messageToSend }));
+      // append images if present
+      if (selectedImages.length > 0) {
+        selectedImages.forEach((file) => formData.append("images", file));
+      }
 
       const newMsg = await sendMessageApi({
         chatId: selectedChat.id,
@@ -755,21 +769,27 @@ export default function SupportPage() {
         text: newMsg.text,
       });
 
-      setSelectedChat((prev) =>
-        prev
-          ? {
-              ...prev,
-              lastMessage: newMsg.text,
-              lastMessageTime: new Date(newMsg.createdAt).toLocaleTimeString(
-                [],
-                { hour: "2-digit", minute: "2-digit" }
-              ),
-              lastMessageDate: new Date(newMsg.createdAt),
-            }
-          : prev
-      );
+      setSelectedChat((prev) => {
+        if (!prev) return prev;
+        const summary = newMsg?.text?.trim()
+          ? newMsg.text
+          : Array.isArray(newMsg?.images) && newMsg.images.length > 0
+          ? "Image"
+          : "No messages yet";
+        return {
+          ...prev,
+          lastMessage: summary,
+          lastMessageTime: new Date(newMsg.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          lastMessageDate: new Date(newMsg.createdAt),
+        };
+      });
 
       refetch();
+      // clear selected images after successful send
+      setSelectedImages([]);
     } catch (err) {
       console.error(err);
     }
@@ -781,6 +801,15 @@ export default function SupportPage() {
     }, 50);
     return () => clearTimeout(timeout);
   }, [messages]);
+
+  // Maintain preview URLs for selected images and revoke on cleanup / change
+  useEffect(() => {
+    const urls = selectedImages.map((f) => URL.createObjectURL(f));
+    setSelectedPreviews(urls);
+    return () => {
+      urls.forEach((u) => URL.revokeObjectURL(u));
+    };
+  }, [selectedImages]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -962,13 +991,77 @@ export default function SupportPage() {
                   </div>
                 </ScrollArea>
 
-                <div className="border-t p-4">
-                  <div className="flex space-x-2">
+                <div className="border-t p-4 space-y-3">
+                  {/* Selected image previews */}
+                  {selectedImages.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedImages.map((file, idx) => {
+                        const preview = URL.createObjectURL(file);
+                        return (
+                          <div
+                            key={idx}
+                            className="relative h-16 w-16 rounded-md overflow-hidden border"
+                          >
+                            <Image
+                              src={preview}
+                              alt={`selected-${idx}`}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
+                            <button
+                              type="button"
+                              className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 shadow"
+                              onClick={() =>
+                                setSelectedImages((prev) =>
+                                  prev.filter((_, i) => i !== idx)
+                                )
+                              }
+                              aria-label="Remove image"
+                            >
+                              <XIcon className="h-3 w-3" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length) {
+                          setSelectedImages((prev) => [...prev, ...files]);
+                        }
+                        // reset value so picking the same file again still triggers change
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => fileInputRef.current?.click()}
+                      title="Attach images"
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                    </Button>
                     <Input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type your message..."
-                      onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage();
+                        }
+                      }}
                     />
                     <Button onClick={sendMessage} disabled={sending}>
                       <Send className="h-4 w-4" />
