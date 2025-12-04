@@ -75,7 +75,7 @@ export default function NewsPage() {
     return html.replace(/<[^>]+>/g, "");
   };
 
-  if (isLoading) return <Spinner />;
+  // if (isLoading) return <Spinner />;
   // if (error) return <p>Error loading news.</p>;
 
   return (

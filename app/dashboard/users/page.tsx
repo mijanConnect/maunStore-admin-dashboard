@@ -49,7 +49,7 @@ export default function UsersPage() {
     totalPage: 1,
   };
 
-  if (isLoading) return <Spinner />;
+  // if (isLoading) return <Spinner />;
   // if (error) return <p>Error fetching users</p>;
 
   const handleStatusToggle = async (

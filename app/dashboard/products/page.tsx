@@ -147,7 +147,7 @@ export default function ProductsPage() {
   const [deleteProduct] = useDeleteProductMutation();
 
   // Handle loading
-  if (categoriesLoading || productsLoading) return <Spinner />;
+  // if (categoriesLoading || productsLoading) return <Spinner />;
 
   // Handle errors
   // if (categoriesError) return <p>Error fetching categories</p>;

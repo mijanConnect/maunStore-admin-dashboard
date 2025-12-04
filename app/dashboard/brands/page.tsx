@@ -60,7 +60,7 @@ export default function BrandsPage() {
 
   const [deleteBrand] = useDeleteBrandMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
-  if (brandsLoading || categoriesLoading) return <Spinner />;
+  // if (brandsLoading || categoriesLoading) return <Spinner />;
 
   const handleAdd = () => {
     setEditingItem(null);
