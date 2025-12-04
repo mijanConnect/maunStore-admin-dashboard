@@ -1,4 +1,3 @@
-
 import { io, Socket } from "socket.io-client";
 
 interface Message {
@@ -29,6 +28,7 @@ class SocketService {
         process.env.NEXT_PUBLIC_SOCKET_URL ||
           // "https://moshfiqur5000.binarybards.online",
           "https://api.raconliapp.com",
+          // "http://10.10.7.48:5000",
         {
           autoConnect: true,
         }
