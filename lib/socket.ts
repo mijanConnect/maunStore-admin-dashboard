@@ -27,8 +27,8 @@ class SocketService {
         // process.env.NEXT_PUBLIC_SOCKET_URL || "http://10.10.7.111:5000",
         process.env.NEXT_PUBLIC_SOCKET_URL ||
           // "https://moshfiqur5000.binarybards.online",
-          "https://api.raconliapp.com",
-          // "http://10.10.7.48:5000",
+          // "https://api.raconliapp.com",
+          "http://10.10.7.48:5000",
         {
           autoConnect: true,
         }
