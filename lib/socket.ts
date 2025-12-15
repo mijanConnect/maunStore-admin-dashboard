@@ -28,9 +28,15 @@ class SocketService {
         process.env.NEXT_PUBLIC_SOCKET_URL ||
           // "https://moshfiqur5000.binarybards.online",
           "https://api.raconliapp.com",
-          // "http://10.10.7.48:5000",
+        // "http://10.10.7.48:5000",
         {
           autoConnect: true,
+          transports: ["websocket", "polling"],
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          reconnectionAttempts: 5,
+          timeout: 20000,
         }
       );
 
@@ -43,7 +49,16 @@ class SocketService {
       });
 
       this.socket.on("connect_error", (err) => {
-        console.error("Socket connection error:", err.message);
+        console.warn("Socket connection error:", err.message);
+        // Silently handle connection errors without crashing
+      });
+
+      this.socket.on("reconnect_attempt", (attempt) => {
+        console.log(`Socket reconnection attempt ${attempt}`);
+      });
+
+      this.socket.on("reconnect_failed", () => {
+        console.warn("Socket reconnection failed. Please check your server.");
       });
     }
 
