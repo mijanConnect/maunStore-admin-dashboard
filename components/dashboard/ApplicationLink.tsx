@@ -11,7 +11,8 @@ interface ApplicationLinkProps {
 }
 
 export default function ApplicationLink({
-  link = "https://raconliapp.com/download",
+  // link = "https://raconliapp.com/download",
+  link = "https://play.google.com/store/apps/details?id=com.raconligroup.watch_store&hl=en",
 }: ApplicationLinkProps) {
   const [isCopied, setIsCopied] = useState(false);
 
