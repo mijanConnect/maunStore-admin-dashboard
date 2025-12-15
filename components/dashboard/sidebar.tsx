@@ -23,6 +23,7 @@ import {
   Layers3,
   Newspaper,
   Image,
+  User,
 } from "lucide-react";
 
 const menuItems = [
@@ -39,6 +40,11 @@ const menuItems = [
     title: "Application Link",
     href: "/dashboard/application-link",
     icon: ExternalLink,
+  },
+  {
+    title: "FAQ Management",
+    href: "/dashboard/faq-management",
+    icon: Users,
   },
   { title: "Support Chat", href: "/dashboard/support", icon: MessageCircle },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },

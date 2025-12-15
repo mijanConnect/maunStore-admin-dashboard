@@ -16,6 +16,7 @@ export const api = createApi({
     "Chats",
     "chatId",
     "Messages",
+    "FAQ",
   ],
   baseQuery: fetchBaseQuery({
     // baseUrl: "http://10.10.7.111:5003/api/v1",
