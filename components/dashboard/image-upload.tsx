@@ -181,12 +181,12 @@ export function ImageUpload({
         </div>
       )}
 
-      {isMaxReached && (
+      {/* {isMaxReached && (
         <p className="text-amber-600 text-sm">
           Maximum number of images reached ({maxFiles}). Remove some images to
           add more.
         </p>
-      )}
+      )} */}
     </div>
   );
 }
