@@ -20,7 +20,7 @@ import {
 } from "@/lib/redux/apiSlice/faqApi";
 import { FAQ } from "@/types";
 import { Edit, Plus, Search, Trash2, Eye } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function FAQPage() {
@@ -30,19 +30,11 @@ export default function FAQPage() {
   const [modalMode, setModalMode] = useState<"add" | "edit" | "view">("add");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: faqsData, isLoading } = useGetFAQsQuery({
+  const { data: faqs = [], isLoading } = useGetFAQsQuery({
     page: currentPage,
     limit: 10,
   });
-  const [deleteFAQ] = useDeleteFAQMutation();
-
-  const faqs = faqsData?.data?.data || [];
-  const meta = faqsData?.data?.meta || {
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPage: 1,
-  };
+  const [deleteFAQ, { isLoading: isDeleting }] = useDeleteFAQMutation();
 
   const filteredFAQs = faqs.filter(
     (faq) =>
@@ -85,16 +77,17 @@ export default function FAQPage() {
     setEditingFAQ(null);
   };
 
-  // if (isLoading) {
-  //   return <Spinner />;
-  // }
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">FAQs</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold tracking-tight">FAQs</h1>
+          <p className="mt-1 text-sm text-gray-600">
             Manage your frequently asked questions
           </p>
         </div>
@@ -104,70 +97,94 @@ export default function FAQPage() {
         </Button>
       </div>
 
+      {/* FAQ List Card */}
       <Card>
-        <CardHeader>
-          <CardTitle>FAQ List</CardTitle>
-          <div className="mt-4 flex items-center gap-2">
+        <CardHeader className="pb-1">
+          <div className="flex items-center justify-between">
+            <CardTitle>FAQ List</CardTitle>
+            <span className="text-sm text-gray-500">
+              Total: {faqs.length} FAQs
+            </span>
+          </div>
+          {/* <div className="mt-4 flex items-center gap-2">
             <Search className="w-4 h-4 text-gray-400" />
             <Input
-              placeholder="Search FAQs..."
+              placeholder="Search by question, answer, or category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1"
             />
-          </div>
+          </div> */}
         </CardHeader>
         <CardContent>
           {filteredFAQs.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500">No FAQs found</p>
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-base">
+                {faqs.length === 0
+                  ? "No FAQs created yet"
+                  : "No FAQs match your search"}
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Question</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="w-1/3">Question</TableHead>
+                    <TableHead className="w-1/3">Answer</TableHead>
+                    {/* <TableHead className="w-24">Category</TableHead> */}
+                    <TableHead className="w-28">Created Date</TableHead>
+                    <TableHead className="w-28 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredFAQs.map((faq) => (
-                    <TableRow key={faq._id}>
-                      <TableCell className="max-w-xs truncate">
+                    <TableRow key={faq._id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium truncate max-w-xs">
                         {faq.question}
                       </TableCell>
-                      <TableCell>{faq.category || "General"}</TableCell>
-                      <TableCell>
-                        <Badge variant={faq.isActive ? "default" : "secondary"}>
-                          {faq.isActive ? "Active" : "Inactive"}
-                        </Badge>
+                      <TableCell className="text-sm text-gray-600 truncate max-w-sm">
+                        {faq.answer}
                       </TableCell>
+                      {/* <TableCell className="text-sm">
+                        {faq.category ? (
+                          <Badge variant="outline">{faq.category}</Badge>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </TableCell> */}
                       <TableCell className="text-sm text-gray-500">
-                        {new Date(faq.createdAt).toLocaleDateString()}
+                        {faq.createdAt
+                          ? new Date(faq.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )
+                          : "-"}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleViewClick(faq)}
-                            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                            className="inline-flex items-center justify-center p-2 hover:bg-blue-50 rounded-md transition-colors"
                             title="View"
                           >
                             <Eye className="w-4 h-4 text-blue-600" />
                           </button>
-                          <button
+                          {/* <button
                             onClick={() => handleEditClick(faq)}
-                            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                            className="inline-flex items-center justify-center p-2 hover:bg-green-50 rounded-md transition-colors"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4 text-green-600" />
-                          </button>
+                          </button> */}
                           <button
                             onClick={() => handleDeleteClick(faq._id)}
-                            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                            disabled={isDeleting}
+                            className="inline-flex items-center justify-center p-2 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
@@ -183,30 +200,7 @@ export default function FAQPage() {
         </CardContent>
       </Card>
 
-      {meta.totalPage > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm">
-            Page {meta.page} of {meta.totalPage}
-          </span>
-          <Button
-            variant="outline"
-            onClick={() =>
-              setCurrentPage(Math.min(meta.totalPage, currentPage + 1))
-            }
-            disabled={currentPage === meta.totalPage}
-          >
-            Next
-          </Button>
-        </div>
-      )}
-
+      {/* Modal */}
       <FAQModal
         isOpen={showModal}
         onClose={handleCloseModal}
