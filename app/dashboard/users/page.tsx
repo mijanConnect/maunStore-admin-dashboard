@@ -140,7 +140,7 @@ export default function UsersPage() {
         <CardContent>
           {filteredUsers.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-4xl mb-4">👥</div>
+              {/* <div className="text-4xl mb-4">👥</div>  */}
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">📦</div>
                 <h3 className="text-lg font-medium mb-2">No users found</h3>
