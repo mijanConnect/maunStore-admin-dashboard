@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   useCreateNewsMutation,
   useUpdateNewsMutation,
@@ -23,14 +24,6 @@ import { News } from "@/types";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { getImageUrl } from "./imageUrl";
-
-import { useRef } from "react";
-
-// Dynamically import Jodit Editor to avoid SSR issues
-const JoditEditor = dynamic(() => import("jodit-react"), {
-  ssr: false,
-  loading: () => <p>Loading editor...</p>,
-});
 
 interface NewsModalProps {
   isOpen: boolean;
@@ -51,8 +44,6 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState("");
-
-  const editor = useRef<any>(null);
 
   const {
     register,
@@ -223,36 +214,6 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
     }
   };
 
-  const editorConfig = {
-    readonly: mode === "view",
-    height: 300,
-    toolbar: mode !== "view",
-    toolbarButtonSize: "small" as const,
-    buttons: [
-      "bold",
-      "italic",
-      "underline",
-      "strikethrough",
-      "|",
-      "ul",
-      "ol",
-      "|",
-      "font",
-      "fontsize",
-      "paragraph",
-      "|",
-      "link",
-      "image",
-      "|",
-      "align",
-      "|",
-      "undo",
-      "redo",
-      "|",
-      "source",
-    ],
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -279,14 +240,14 @@ export function NewsModal({ isOpen, onClose, news, mode }: NewsModalProps) {
 
           <div className="space-y-2">
             <Label htmlFor="description">News Description</Label>
-            <div className="min-h-[300px]">
-              <JoditEditor
-                ref={editor}
-                value={content}
-                config={editorConfig}
-                onBlur={(newContent) => setContent(newContent)}
-              />
-            </div>
+            <Textarea
+              id="description"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Enter news description"
+              disabled={mode === "view"}
+              className="min-h-[200px]"
+            />
             {errors.description && (
               <p className="text-sm text-red-500">
                 {errors.description.message}
